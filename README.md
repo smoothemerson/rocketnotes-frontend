@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img alt="NoteHub-Front" src="./.github/preview.png" width="100%">
+  <img alt="NoteHub-Front" src="./.github/img.png" width="100%">
 </p>
 
 ## 🚀 Technologies
