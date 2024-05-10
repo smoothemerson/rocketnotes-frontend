@@ -1,4 +1,4 @@
-<h1 align="center"> Rocketnotes </h1>
+<h1 align="center"> NoteHub-Front </h1>
 
 <p align="center">
   <a href="#-technologies">Technologies</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img alt="Rocketnotes" src="./.github/preview.png" width="100%">
+  <img alt="NoteHub-Front" src="./.github/preview.png" width="100%">
 </p>
 
 ## 🚀 Technologies
@@ -20,4 +20,4 @@ This project was developed with the following technologies:
 
 ## 💻 Project
 
-- Rocketnotes is a front-end application dedicated to register users, notes, tags. 
+- NoteHub-Front is a front-end application dedicated to register users, notes, tags. 
