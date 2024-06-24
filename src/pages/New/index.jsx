@@ -87,7 +87,7 @@ export function New() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [title, description, rating, tags, newTag]);
+  }, [title, description, links, newLink, tags, newTag]);
 
   return (
     <Container>
