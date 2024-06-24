@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Textarea } from "../../components/Textarea";
@@ -9,10 +8,9 @@ import { Button } from "../../components/Button";
 import { ButtonText } from "../../components/ButtonText";
 import { Header } from "../../components/Header";
 import { Input } from "../../components/Input";
+import { Container, Form } from "./styles";
 
 import { api } from "../../services/api";
-
-import { Container, Form } from "./styles";
 
 export function New() {
   const [title, setTitle] = useState("");
@@ -75,6 +73,21 @@ export function New() {
     alert("Nota criada com sucesso!");
     navigate(-1);
   }
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleNewNote();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [title, description, rating, tags, newTag]);
 
   return (
     <Container>
