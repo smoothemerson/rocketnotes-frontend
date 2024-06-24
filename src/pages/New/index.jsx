@@ -51,11 +51,11 @@ export function New() {
       return alert("Digite o título da nota");
     }
 
-    if (!links) {
+    if (newLink.length < 1 && links.length < 1) {
       return alert("Digite um link para a nota");
     }
 
-    if (!tags) {
+    if (newTag.length < 1 && tags.length < 1) {
       return alert("Digite uma tag para a nota");
     }
 
