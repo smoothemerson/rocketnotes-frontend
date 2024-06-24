@@ -51,6 +51,14 @@ export function New() {
       return alert("Digite o título da nota");
     }
 
+    if (!links) {
+      return alert("Digite um link para a nota");
+    }
+
+    if (!tags) {
+      return alert("Digite uma tag para a nota");
+    }
+
     if (newLink) {
       return alert(
         "Você deixou um link no campo para adicionar, mas não clicou em adicionar. Clique para adicionar ou deixe o campo vazio."
