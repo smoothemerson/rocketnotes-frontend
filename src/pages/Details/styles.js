@@ -54,7 +54,7 @@ export const Content = styled.div`
   .title {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 
     padding-top: 64px;
   }

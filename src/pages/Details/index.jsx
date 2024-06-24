@@ -45,8 +45,8 @@ export function Details() {
         <main>
           <Content>
             <div className="title">
-              <ButtonText title="Excluir nota" onClick={handleRemove} />
               <h1>{data.title}</h1>
+              <ButtonText title="Excluir nota" onClick={handleRemove} />
             </div>
             
             <p>{data.description}</p>
