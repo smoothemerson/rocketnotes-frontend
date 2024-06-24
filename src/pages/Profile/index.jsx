@@ -1,17 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiArrowLeft, FiUser, FiMail, FiLock, FiCamera } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../hooks/auth";
 
 import avatarPlaceholder from "../../assets/avatar_placeholder.svg";
-
-import { api } from "../../services/api";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { ButtonText } from "../../components/ButtonText";
-
 import { Container, Form, Avatar } from "./styles";
+
+import { api } from "../../services/api";
 
 export function Profile() {
   const { user, updateProfile } = useAuth();
@@ -25,7 +24,10 @@ export function Profile() {
     ? `${api.defaults.baseURL}/files/${user.avatar}`
     : avatarPlaceholder;
   const [avatar, setAvatar] = useState(avatarURL);
+  const [originalAvatar, setOriginalAvatar] = useState(avatarURL);
   const [avatarFile, setAvatarFile] = useState(null);
+
+  const [isChanged, setIsChanged] = useState(false);
 
   const navigate = useNavigate();
 
@@ -34,6 +36,8 @@ export function Profile() {
   }
 
   async function handleUpdate() {
+    if (!isChanged) return;
+
     const updated = {
       name,
       email,
@@ -43,7 +47,20 @@ export function Profile() {
 
     const userUpdated = Object.assign(user, updated);
 
-    await updateProfile({ user: userUpdated, avatarFile });
+    if (avatarFile) {
+      await updateProfile({ user: userUpdated, avatarFile });
+
+      const newAvatarURL = URL.createObjectURL(avatarFile);
+      setAvatar(newAvatarURL);
+      setOriginalAvatar(newAvatarURL);
+      setAvatarFile(null);
+    } else {
+      await updateProfile({ user: userUpdated });
+    }
+
+    setPasswordOld("");
+    setPasswordNew("");
+    setIsChanged(false);
   }
 
   function handleChangeAvatar(event) {
@@ -53,6 +70,40 @@ export function Profile() {
     const imagePreview = URL.createObjectURL(file);
     setAvatar(imagePreview);
   }
+
+  useEffect(() => {
+    const hasChanged =
+      name !== user.name ||
+      email !== user.email ||
+      passwordOld ||
+      passwordNew ||
+      avatar !== originalAvatar;
+
+    setIsChanged(hasChanged);
+  }, [
+    name,
+    email,
+    passwordOld,
+    passwordNew,
+    avatar,
+    originalAvatar,
+    user.name,
+    user.email,
+  ]);
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Enter" && isChanged) {
+        handleUpdate();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [name, email, passwordOld, passwordNew, avatarFile]);
 
   return (
     <Container>
@@ -93,6 +144,7 @@ export function Profile() {
           placeholder="Senha atual"
           type="password"
           icon={FiLock}
+          value={passwordOld}
           onChange={(e) => setPasswordOld(e.target.value)}
         />
 
@@ -100,10 +152,15 @@ export function Profile() {
           placeholder="Nova senha"
           type="password"
           icon={FiLock}
+          value={passwordNew}
           onChange={(e) => setPasswordNew(e.target.value)}
         />
 
-        <Button title="Salvar" onClick={handleUpdate} />
+        <Button
+          title="Salvar"
+          onClick={handleUpdate}
+          className={isChanged ? "active" : "inactive"}
+        />
       </Form>
     </Container>
   );
