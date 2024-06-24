@@ -44,10 +44,11 @@ export function Details() {
       {data && (
         <main>
           <Content>
-            <ButtonText title="Excluir nota" onClick={handleRemove} />
-
-            <h1>{data.title}</h1>
-
+            <div className="title">
+              <ButtonText title="Excluir nota" onClick={handleRemove} />
+              <h1>{data.title}</h1>
+            </div>
+            
             <p>{data.description}</p>
 
             {data.links && (

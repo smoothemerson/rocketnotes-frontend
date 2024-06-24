@@ -43,12 +43,19 @@ export const Content = styled.div`
   > h1 {
     font-size: 36px;
     font-weight: 500;
-    padding-top: 64px;
   }
 
   > p {
     font-size: 16px;
     margin-top: 16px;
     text-align: justify;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-top: 64px;
   }
 `
