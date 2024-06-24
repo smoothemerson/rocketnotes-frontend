@@ -25,6 +25,7 @@ export const Links = styled.ul`
 
     a {
       color: ${({ theme }) => theme.COLORS.WHITE};
+      word-wrap: break-word;
     }
   }
 `
