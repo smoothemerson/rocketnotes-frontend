@@ -6,12 +6,15 @@ import { Button } from "../../components/Button";
 import { Header } from "../../components/Header";
 import { Section } from "../../components/Section";
 import { ButtonText } from "../../components/ButtonText";
-import { Container, Links, Content } from "./styles";
+import { Container, Links, Content, StatusCard } from "./styles";
 
 import { api } from "../../services/api";
 
 export function Details() {
   const [data, setData] = useState(null);
+
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isStatusVisible, setIsStatusVisible] = useState(false);
 
   const params = useParams();
   const navigate = useNavigate();
@@ -21,12 +24,19 @@ export function Details() {
   }
 
   async function handleRemove() {
-    const confirm = window.confirm("Deseja realmente remover a nota?");
+    setStatusMessage("Deseja realmente remover a nota?");
+    setIsStatusVisible(true);
+  }
 
-    if (confirm) {
-      await api.delete(`/notes/${params.id}`);
-      navigate(-1);
-    }
+  async function deleteNote() {
+    await api.delete(`/notes/${params.id}`);
+    navigate(-1);
+    setIsStatusVisible(false);
+  }
+
+  function handleCloseStatus() {
+    setIsStatusVisible(false);
+    setStatusMessage("");
   }
 
   useEffect(() => {
@@ -48,7 +58,7 @@ export function Details() {
               <h1>{data.title}</h1>
               <ButtonText title="Excluir nota" onClick={handleRemove} />
             </div>
-            
+
             <p>{data.description}</p>
 
             {data.links && (
@@ -76,6 +86,14 @@ export function Details() {
             <Button title="Voltar" onClick={handleBack} />
           </Content>
         </main>
+      )}
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+          <Button title="Sim" onClick={deleteNote} />
+          <Button title="Não" onClick={handleCloseStatus} />
+        </StatusCard>
       )}
     </Container>
   );

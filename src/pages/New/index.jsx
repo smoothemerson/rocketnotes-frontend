@@ -8,7 +8,7 @@ import { Button } from "../../components/Button";
 import { ButtonText } from "../../components/ButtonText";
 import { Header } from "../../components/Header";
 import { Input } from "../../components/Input";
-import { Container, Form } from "./styles";
+import { Container, Form, StatusCard } from "./styles";
 
 import { api } from "../../services/api";
 
@@ -21,6 +21,10 @@ export function New() {
 
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
+
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isStatusVisible, setIsStatusVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,28 +52,42 @@ export function New() {
 
   async function handleNewNote() {
     if (!title) {
-      return alert("Digite o título da nota");
+      setStatusMessage("Digite o título da nota");
+      setIsStatusVisible(true);
+      return;
     }
 
     if (newLink.length < 1 && links.length < 1) {
-      return alert("Digite um link para a nota");
+      setStatusMessage("Digite um link para a nota");
+      setIsStatusVisible(true);
+      return;
     }
 
     if (newTag.length < 1 && tags.length < 1) {
-      return alert("Digite uma tag para a nota");
+      setStatusMessage("Digite uma tag para a nota");
+      setIsStatusVisible(true);
+      return;
     }
 
     if (newLink) {
-      return alert(
+      setStatusMessage(
         "Você deixou um link no campo para adicionar, mas não clicou em adicionar. Clique para adicionar ou deixe o campo vazio."
       );
+      setIsStatusVisible(true);
+      return;
     }
 
     if (newTag) {
-      return alert(
+      setStatusMessage(
         "Você deixou uma tag no campo para adicionar, mas não clicou em adicionar. Clique para adicionar ou deixe o campo vazio."
       );
+      setIsStatusVisible(true);
+      return;
     }
+
+    setIsLoading(true);
+    setIsStatusVisible(true);
+    setStatusMessage("Criando nota...");
 
     await api.post("/notes", {
       title,
@@ -78,15 +96,24 @@ export function New() {
       links,
     });
 
-    alert("Nota criada com sucesso!");
+    setStatusMessage("Usuário cadastrado com sucesso!");
     navigate(-1);
+  }
+
+  function handleCloseStatus() {
+    setIsStatusVisible(false);
+    setStatusMessage("");
   }
 
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Enter") {
         event.preventDefault();
-        handleNewNote();
+        if (isStatusVisible && !isLoading) {
+          handleCloseStatus();
+        } else if (!isStatusVisible) {
+          handleNewNote();
+        }
       }
     }
 
@@ -95,7 +122,16 @@ export function New() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [title, description, links, newLink, tags, newTag]);
+  }, [
+    isStatusVisible,
+    isLoading,
+    title,
+    description,
+    links,
+    newLink,
+    tags,
+    newTag,
+  ]);
 
   return (
     <Container>
@@ -157,6 +193,13 @@ export function New() {
           <Button title="Salvar" onClick={handleNewNote} />
         </Form>
       </main>
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+          {!isLoading && <Button title="OK" onClick={handleCloseStatus} />}
+        </StatusCard>
+      )}
     </Container>
   );
 }
