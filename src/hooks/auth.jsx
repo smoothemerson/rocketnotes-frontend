@@ -73,6 +73,7 @@ function AuthProvider({ children }) {
       } else {
         setStatusMessage("Não foi possível atualizar o perfil.");
       }
+      throw error
     } finally {
       setIsLoading(false);
     }
