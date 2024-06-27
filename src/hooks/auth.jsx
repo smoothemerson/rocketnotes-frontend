@@ -7,8 +7,16 @@ export const AuthContext = createContext({});
 function AuthProvider({ children }) {
   const [data, setData] = useState({});
 
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isStatusVisible, setIsStatusVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   async function signIn({ email, password }) {
     try {
+      setIsLoading(true);
+      setIsStatusVisible(true);
+      setStatusMessage("Carregando...");
+
       const response = await api.post("/sessions", { email, password });
       const { user, token } = response.data;
 
@@ -18,11 +26,15 @@ function AuthProvider({ children }) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       setData({ user, token });
+      setStatusMessage("");
+      setIsStatusVisible(false);
     } catch (error) {
+      setIsLoading(false);
+      setIsStatusVisible(true);
       if (error.response) {
-        alert(error.response.data.message);
+        setStatusMessage(error.response.data.message);
       } else {
-        alert("Não foi possível entrar.");
+        setStatusMessage("Não foi possível entrar.");
       }
     }
   }
@@ -36,6 +48,10 @@ function AuthProvider({ children }) {
 
   async function updateProfile({ user, avatarFile }) {
     try {
+      setIsLoading(true);
+      setIsStatusVisible(true);
+      setStatusMessage("Atualizando perfil...");
+
       if (avatarFile) {
         const fileUploadForm = new FormData();
         fileUploadForm.append("avatar", avatarFile);
@@ -48,13 +64,17 @@ function AuthProvider({ children }) {
       localStorage.setItem("@rocketnotes:user", JSON.stringify(user));
 
       setData({ user, token: data.token });
-      alert("Perfil atualizado!");
+      setStatusMessage("Perfil Atualizado!");
     } catch (error) {
+      setIsLoading(false);
+      setIsStatusVisible(true);
       if (error.response) {
-        alert(error.response.data.message);
+        setStatusMessage(error.response.data.message);
       } else {
-        alert("Não foi possível atualizar o perfil.");
+        setStatusMessage("Não foi possível atualizar o perfil.");
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -79,6 +99,11 @@ function AuthProvider({ children }) {
         signOut,
         updateProfile,
         user: data.user,
+        statusMessage,
+        isStatusVisible,
+        isLoading,
+        setStatusMessage,
+        setIsStatusVisible,
       }}
     >
       {children}
