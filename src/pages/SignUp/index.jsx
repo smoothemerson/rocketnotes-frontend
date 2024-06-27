@@ -7,39 +7,60 @@ import { api } from "../../services/api";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 
-import { Container, Form, Background } from "./styles";
+import { Container, Form, Background, StatusCard } from "./styles";
 
 export function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isStatusVisible, setIsStatusVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  function handleSignUp() {
+  async function handleSignUp() {
     if (!name || !email || !password) {
-      return alert("Preencha todos os campos!");
+      setStatusMessage("Preencha todos os campos!");
+      setIsStatusVisible(true);
+      return;
     }
 
-    api
-      .post("/users", { name, email, password })
-      .then(() => {
-        alert("Usuário cadastrado com sucesso!");
-        navigate("/");
-      })
-      .catch((error) => {
-        if (error.response) {
-          alert(error.response.data.message);
-        } else {
-          alert("Não foi possível cadastrar");
-        }
-      });
+    setIsLoading(true);
+    setIsStatusVisible(true);
+    setStatusMessage("Carregando...");
+
+    try {
+      await api.post("/users", { name, email, password });
+      setStatusMessage("Usuário cadastrado com sucesso!");
+    } catch (error) {
+      if (error.response) {
+        setStatusMessage(error.response.data.message);
+      } else {
+        setStatusMessage("Não foi possível cadastrar");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleCloseStatus() {
+    setIsStatusVisible(false);
+    if (statusMessage === "Usuário cadastrado com sucesso!") {
+      navigate("/");
+    }
   }
 
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Enter") {
-        handleSignUp();
+        event.preventDefault();
+        if (isStatusVisible && !isLoading) {
+          handleCloseStatus();
+        } else if (!isStatusVisible) {
+          handleSignUp();
+        }
       }
     }
 
@@ -48,7 +69,7 @@ export function SignUp() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [name, email, password]);
+  }, [isStatusVisible, isLoading, name, email, password]);
 
   return (
     <Container>
@@ -85,6 +106,13 @@ export function SignUp() {
 
         <Link to="/">Voltar para o login</Link>
       </Form>
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+          {!isLoading && <Button title="OK" onClick={handleCloseStatus} />}
+        </StatusCard>
+      )}
     </Container>
   );
 }
