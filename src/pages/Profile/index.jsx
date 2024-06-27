@@ -24,6 +24,7 @@ export function Profile() {
 
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
+  const [originalEmail, setOriginalEmail] = useState(user.email);
   const [passwordOld, setPasswordOld] = useState("");
   const [passwordNew, setPasswordNew] = useState("");
 
@@ -54,20 +55,26 @@ export function Profile() {
 
     const userUpdated = Object.assign(user, updated);
 
-    if (avatarFile) {
-      await updateProfile({ user: userUpdated, avatarFile });
+    try {
+      if (avatarFile) {
+        await updateProfile({ user: userUpdated, avatarFile });
 
-      const newAvatarURL = URL.createObjectURL(avatarFile);
-      setAvatar(newAvatarURL);
-      setOriginalAvatar(newAvatarURL);
-      setAvatarFile(null);
-    } else {
-      await updateProfile({ user: userUpdated });
+        const newAvatarURL = URL.createObjectURL(avatarFile);
+        setAvatar(newAvatarURL);
+        setOriginalAvatar(newAvatarURL);
+        setAvatarFile(null);
+      } else {
+        await updateProfile({ user: userUpdated });
+      }
+
+      setOriginalEmail(email);
+      setPasswordOld("");
+      setPasswordNew("");
+      setIsChanged(false);
+    } catch (error) {
+      setEmail(originalEmail);
+      setIsChanged(false);
     }
-
-    setPasswordOld("");
-    setPasswordNew("");
-    setIsChanged(false);
   }
 
   function handleCloseStatus() {
@@ -87,6 +94,7 @@ export function Profile() {
     const hasChanged =
       name !== user.name ||
       email !== user.email ||
+      email !== originalEmail ||
       passwordOld ||
       passwordNew ||
       avatar !== originalAvatar;
@@ -107,7 +115,7 @@ export function Profile() {
     function handleKeyDown(event) {
       if (event.key === "Enter") {
         event.preventDefault();
-        if (isStatusVisible && !isLoading && !isChanged) {
+        if (isStatusVisible && !isLoading) {
           handleCloseStatus();
         } else if (!isStatusVisible && isChanged) {
           handleUpdate();
@@ -120,7 +128,13 @@ export function Profile() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isStatusVisible, isLoading, isChanged, handleUpdate, handleCloseStatus]);
+  }, [isStatusVisible, isLoading, isChanged]);
+
+  useEffect(() => {
+    if (isStatusVisible && email === originalEmail) {
+      setIsChanged(false);
+    }
+  }, [isStatusVisible, email, originalEmail]);
 
   return (
     <Container>
