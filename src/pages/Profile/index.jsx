@@ -7,18 +7,25 @@ import { useAuth } from "../../hooks/auth";
 import avatarPlaceholder from "../../assets/avatar_placeholder.svg";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
-import { ButtonText } from "../../components/ButtonText";
-import { Container, Form, Avatar } from "./styles";
+import { Container, Form, Avatar, StatusCard } from "./styles";
 
 import { api } from "../../services/api";
 
 export function Profile() {
-  const { user, updateProfile } = useAuth();
+  const {
+    user,
+    updateProfile,
+    statusMessage,
+    isStatusVisible,
+    isLoading,
+    setStatusMessage,
+    setIsStatusVisible,
+  } = useAuth();
 
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [passwordOld, setPasswordOld] = useState();
-  const [passwordNew, setPasswordNew] = useState();
+  const [passwordOld, setPasswordOld] = useState("");
+  const [passwordNew, setPasswordNew] = useState("");
 
   const avatarURL = user.avatar
     ? `${api.defaults.baseURL}/files/${user.avatar}`
@@ -63,6 +70,11 @@ export function Profile() {
     setIsChanged(false);
   }
 
+  function handleCloseStatus() {
+    setIsStatusVisible(false);
+    setStatusMessage("");
+  }
+
   function handleChangeAvatar(event) {
     const file = event.target.files[0];
     setAvatarFile(file);
@@ -93,8 +105,13 @@ export function Profile() {
 
   useEffect(() => {
     function handleKeyDown(event) {
-      if (event.key === "Enter" && isChanged) {
-        handleUpdate();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (isStatusVisible && !isLoading && !isChanged) {
+          handleCloseStatus();
+        } else if (!isStatusVisible && isChanged) {
+          handleUpdate();
+        }
       }
     }
 
@@ -103,7 +120,7 @@ export function Profile() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [name, email, passwordOld, passwordNew, avatarFile]);
+  }, [isStatusVisible, isLoading, isChanged, handleUpdate, handleCloseStatus]);
 
   return (
     <Container>
@@ -162,6 +179,13 @@ export function Profile() {
           className={isChanged ? "active" : "inactive"}
         />
       </Form>
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+          {!isLoading && <Button title="OK" onClick={handleCloseStatus} />}
+        </StatusCard>
+      )}
     </Container>
   );
 }
