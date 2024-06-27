@@ -7,30 +7,44 @@ import { useAuth } from "../../hooks/auth";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 
-import { Container, Form, Background } from "./styles";
+import { Container, Form, Background, StatusCard } from "./styles";
 
 export function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { signIn } = useAuth();
+  const {
+    signIn,
+    statusMessage,
+    isStatusVisible,
+    isLoading,
+    setStatusMessage,
+    setIsStatusVisible,
+  } = useAuth();
 
   function handleSignIn() {
+    if (!email || !password) {
+      setStatusMessage("Preencha todos os campos!");
+      setIsStatusVisible(true);
+      return;
+    }
+
     signIn({ email, password });
+  }
+
+  function handleCloseStatus() {
+    setIsStatusVisible(false);
+    setStatusMessage("");
   }
 
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Enter") {
-        if (!email) {
-          alert("Preencha o campo e-mail");
-          return;
+        if (isStatusVisible && !isLoading) {
+          handleCloseStatus();
+        } else if (!isStatusVisible) {
+          handleSignIn();
         }
-        if (!password) {
-          alert("Preencha o campo senha");
-          return;
-        }
-        handleSignIn();
       }
     }
 
@@ -39,7 +53,7 @@ export function SignIn() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [email, password]);
+  }, [isStatusVisible, isLoading, email, password]);
 
   return (
     <Container>
@@ -67,6 +81,13 @@ export function SignIn() {
 
         <Link to="/register">Criar conta</Link>
       </Form>
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+          {!isLoading && <Button title="OK" onClick={handleCloseStatus} />}
+        </StatusCard>
+      )}
 
       <Background />
     </Container>
