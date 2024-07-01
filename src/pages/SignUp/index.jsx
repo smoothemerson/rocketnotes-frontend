@@ -29,7 +29,7 @@ export function SignUp() {
 
     setIsLoading(true);
     setIsStatusVisible(true);
-    setStatusMessage("Carregando...");
+    setStatusMessage("Cadastrando usuário...");
 
     try {
       await api.post("/users", { name, email, password });
