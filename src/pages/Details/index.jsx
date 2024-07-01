@@ -24,15 +24,25 @@ export function Details() {
     navigate(-1);
   }
 
-  async function handleRemove() {
+  function handleRemove() {
     setStatusMessage("Deseja realmente remover a nota?");
     setIsStatusVisible(true);
   }
 
   async function deleteNote() {
-    await api.delete(`/notes/${params.id}`);
-    navigate(-1);
-    setIsStatusVisible(false);
+    try {
+      await api.delete(`/notes/${params.id}`);
+      handleBack();
+      setIsStatusVisible(false);
+    } catch (error) {
+      if (error.response) {
+        setStatusMessage(error.response.data.message);
+      } else {
+        setStatusMessage("Não foi possível remover a nota");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleCloseStatus() {
@@ -49,6 +59,7 @@ export function Details() {
       try {
         const response = await api.get(`/notes/${params.id}`);
         setData(response.data);
+        setIsStatusVisible(false);
       } catch (error) {
         if (error.response) {
           setStatusMessage(error.response.data.message);
@@ -61,7 +72,7 @@ export function Details() {
     }
 
     fetchNote();
-  }, []);
+  }, [params.id]);
 
   return (
     <Container>
@@ -106,8 +117,15 @@ export function Details() {
       {isStatusVisible && (
         <StatusCard>
           <p>{statusMessage}</p>
-          <Button title="Sim" onClick={deleteNote} />
-          <Button title="Não" onClick={handleCloseStatus} />
+          
+          {statusMessage === "Deseja realmente remover a nota?" ? (
+            <>
+              <Button title="Sim" onClick={deleteNote} />
+              <Button title="Não" onClick={handleCloseStatus} />
+            </>
+          ) : (
+            !isLoading && <Button title="OK" onClick={handleCloseStatus} />
+          )}
         </StatusCard>
       )}
     </Container>
