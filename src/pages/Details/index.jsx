@@ -15,6 +15,7 @@ export function Details() {
 
   const [statusMessage, setStatusMessage] = useState("");
   const [isStatusVisible, setIsStatusVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const params = useParams();
   const navigate = useNavigate();
@@ -41,8 +42,22 @@ export function Details() {
 
   useEffect(() => {
     async function fetchNote() {
-      const response = await api.get(`/notes/${params.id}`);
-      setData(response.data);
+      setIsLoading(true);
+      setIsStatusVisible(true);
+      setStatusMessage("Carregando nota...");
+
+      try {
+        const response = await api.get(`/notes/${params.id}`);
+        setData(response.data);
+      } catch (error) {
+        if (error.response) {
+          setStatusMessage(error.response.data.message);
+        } else {
+          setStatusMessage("Não foi possível visualizar a nota");
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchNote();
