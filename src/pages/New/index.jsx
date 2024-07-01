@@ -103,6 +103,8 @@ export function New() {
       } else {
         setStatusMessage("Não foi possível cadastrar");
       }
+    } finally {
+      setIsLoading(false);
     }
 
     navigate(-1);
