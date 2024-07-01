@@ -2,12 +2,21 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Note } from "../../components/Note";
+import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Header } from "../../components/Header";
 import { Section } from "../../components/Section";
 import { ButtonText } from "../../components/ButtonText";
 import { FiPlus, FiSearch } from "react-icons/fi";
-import { Container, Brand, Menu, Search, Content, NewNote } from "./styles";
+import {
+  Container,
+  Brand,
+  Menu,
+  Search,
+  Content,
+  NewNote,
+  StatusCard,
+} from "./styles";
 
 import { api } from "../../services/api";
 
@@ -16,6 +25,10 @@ export function Home() {
   const [tags, setTags] = useState([]);
   const [tagsSelected, setTagsSelected] = useState([]);
   const [notes, setNotes] = useState([]);
+
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isStatusVisible, setIsStatusVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -42,6 +55,7 @@ export function Home() {
     async function fetchTags() {
       const response = await api.get("/tags");
       setTags(response.data);
+      setIsStatusVisible(false);
     }
 
     fetchTags();
@@ -49,10 +63,24 @@ export function Home() {
 
   useEffect(() => {
     async function fetchNotes() {
-      const response = await api.get(
-        `/notes?title=${search}&tags=${tagsSelected}`
-      );
-      setNotes(response.data);
+      setIsLoading(true);
+      setIsStatusVisible(true);
+      setStatusMessage("Carregando notas...");
+
+      try {
+        const response = await api.get(
+          `/notes?title=${search}&tags=${tagsSelected}`
+        );
+        setNotes(response.data);
+      } catch (error) {
+        if (error.response) {
+          setStatusMessage(error.response.data.message);
+        } else {
+          setStatusMessage("Não foi possível visualizar as notas");
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchNotes();
@@ -110,6 +138,12 @@ export function Home() {
         <FiPlus />
         Criar nota
       </NewNote>
+
+      {isStatusVisible && (
+        <StatusCard>
+          <p>{statusMessage}</p>
+        </StatusCard>
+      )}
     </Container>
   );
 }
