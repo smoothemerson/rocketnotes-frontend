@@ -89,20 +89,30 @@ export function New() {
     setIsStatusVisible(true);
     setStatusMessage("Criando nota...");
 
-    await api.post("/notes", {
-      title,
-      description,
-      tags,
-      links,
-    });
+    try {
+      await api.post("/notes", {
+        title,
+        description,
+        tags,
+        links,
+      });
+      setStatusMessage("Nota cadastrada com sucesso!");
+    } catch (error) {
+      if (error.response) {
+        setStatusMessage(error.response.data.message);
+      } else {
+        setStatusMessage("Não foi possível cadastrar");
+      }
+    }
 
-    setStatusMessage("Usuário cadastrado com sucesso!");
     navigate(-1);
   }
 
   function handleCloseStatus() {
     setIsStatusVisible(false);
-    setStatusMessage("");
+    if (statusMessage === "Nota cadastrada com sucesso!") {
+      handleBack();
+    }
   }
 
   useEffect(() => {
