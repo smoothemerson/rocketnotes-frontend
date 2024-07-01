@@ -106,8 +106,6 @@ export function New() {
     } finally {
       setIsLoading(false);
     }
-
-    navigate(-1);
   }
 
   function handleCloseStatus() {
