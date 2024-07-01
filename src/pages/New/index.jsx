@@ -97,6 +97,8 @@ export function New() {
         links,
       });
       setStatusMessage("Nota cadastrada com sucesso!");
+      setIsStatusVisible(false)
+      handleBack()
     } catch (error) {
       if (error.response) {
         setStatusMessage(error.response.data.message);
@@ -110,9 +112,7 @@ export function New() {
 
   function handleCloseStatus() {
     setIsStatusVisible(false);
-    if (statusMessage === "Nota cadastrada com sucesso!") {
-      handleBack();
-    }
+    setStatusMessage("")
   }
 
   useEffect(() => {
@@ -207,7 +207,6 @@ export function New() {
       {isStatusVisible && (
         <StatusCard>
           <p>{statusMessage}</p>
-          {!isLoading && <Button title="OK" onClick={handleCloseStatus} />}
         </StatusCard>
       )}
     </Container>
