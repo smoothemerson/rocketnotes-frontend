@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { FiArrowLeft, FiUser, FiMail, FiLock, FiCamera } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-
 import { useAuth } from "../../hooks/auth";
-
 import avatarPlaceholder from "../../assets/avatar_placeholder.svg";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { Container, Form, Avatar, StatusCard } from "./styles";
-
 import { api } from "../../services/api";
 
 export function Profile() {
@@ -53,7 +50,7 @@ export function Profile() {
       old_password: passwordOld,
     };
 
-    const userUpdated = Object.assign(user, updated);
+    const userUpdated = Object.assign({}, user, updated);
 
     try {
       if (avatarFile) {
@@ -93,7 +90,6 @@ export function Profile() {
   useEffect(() => {
     const hasChanged =
       name !== user.name ||
-      email !== user.email ||
       email !== originalEmail ||
       passwordOld ||
       passwordNew ||
@@ -108,7 +104,7 @@ export function Profile() {
     avatar,
     originalAvatar,
     user.name,
-    user.email,
+    originalEmail,
   ]);
 
   useEffect(() => {
@@ -130,12 +126,6 @@ export function Profile() {
     };
   }, [isStatusVisible, isLoading, isChanged]);
 
-  useEffect(() => {
-    if (isStatusVisible && email === originalEmail) {
-      setIsChanged(false);
-    }
-  }, [isStatusVisible, email, originalEmail]);
-
   return (
     <Container>
       <header>
@@ -150,7 +140,6 @@ export function Profile() {
 
           <label htmlFor="avatar">
             <FiCamera />
-
             <input id="avatar" type="file" onChange={handleChangeAvatar} />
           </label>
         </Avatar>

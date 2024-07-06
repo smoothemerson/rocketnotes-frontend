@@ -65,17 +65,23 @@ function AuthProvider({ children }) {
 
       setData({ user, token: data.token });
       setStatusMessage("Perfil Atualizado!");
+      setIsStatusVisible(true);
     } catch (error) {
       setIsLoading(false);
       setIsStatusVisible(true);
       if (error.response) {
-        setStatusMessage(error.response.data.message);
+        if (error.response.status === 401) {
+          setStatusMessage("O e-mail já existe.");
+        } else {
+          setStatusMessage(error.response.data.message);
+        }
       } else {
         setStatusMessage("Não foi possível atualizar o perfil.");
       }
-      throw error
+      throw error;
     } finally {
       setIsLoading(false);
+      setIsStatusVisible(true);
     }
   }
 
