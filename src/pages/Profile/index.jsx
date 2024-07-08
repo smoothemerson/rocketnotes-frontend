@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { FiArrowLeft, FiUser, FiMail, FiLock, FiCamera } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../hooks/auth";
+
 import avatarPlaceholder from "../../assets/avatar_placeholder.svg";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { Container, Form, Avatar, StatusCard } from "./styles";
+
 import { api } from "../../services/api";
 
 export function Profile() {
@@ -50,7 +53,7 @@ export function Profile() {
       old_password: passwordOld,
     };
 
-    const userUpdated = Object.assign({}, user, updated);
+    const userUpdated = Object.assign(user, updated);
 
     try {
       if (avatarFile) {
