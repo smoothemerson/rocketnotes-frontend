@@ -20,9 +20,20 @@ export function SignUp() {
 
   const navigate = useNavigate();
 
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  } 
+
   async function handleSignUp() {
     if (!name || !email || !password) {
       setStatusMessage("Preencha todos os campos!");
+      setIsStatusVisible(true);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setStatusMessage("O e-mail fornecido não é válido.");
       setIsStatusVisible(true);
       return;
     }
