@@ -34,7 +34,7 @@ export const Form = styled.form`
   }
 
   > a {
-    margin-top: 124px;
+    margin-top: 50px;
     color: ${({ theme }) => theme.COLORS.ORANGE};
   }
 `
@@ -43,6 +43,22 @@ export const Background = styled.div`
   flex: 1;
   background: url(${backgroundImg}) no-repeat center center;
   background-size: cover;
+`
+
+export const PasswordCriteria = styled.div`
+  p {
+    font-weight: bold;
+    margin-block: 10px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    
+    li {
+      margin-bottom: 5px;
+    }
+  }
 `
 
 export const StatusCard = styled.div`

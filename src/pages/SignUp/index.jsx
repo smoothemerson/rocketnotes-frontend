@@ -7,12 +7,28 @@ import { api } from "../../services/api";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 
-import { Container, Form, Background, StatusCard } from "./styles";
+import {
+  Container,
+  Form,
+  Background,
+  PasswordCriteria,
+  StatusCard,
+} from "./styles";
 
 export function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    upperCase: false,
+    lowerCase: false,
+    number: false,
+    specialChar: false,
+  });
+
+  const showPasswordCriteria = !Object.values(passwordCriteria).every(Boolean);
 
   const [statusMessage, setStatusMessage] = useState("");
   const [isStatusVisible, setIsStatusVisible] = useState(false);
@@ -20,10 +36,27 @@ export function SignUp() {
 
   const navigate = useNavigate();
 
-  function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  } 
+  function validatePassword(password) {
+    const lengthCriteria = /.{8,}/;
+    const upperCaseCriteria = /[A-Z]/;
+    const lowerCaseCriteria = /[a-z]/;
+    const numberCriteria = /[0-9]/;
+    const specialCharCriteria = /[!@#$%^&*(),.?":{}|<>]/;
+
+    return {
+      length: lengthCriteria.test(password),
+      upperCase: upperCaseCriteria.test(password),
+      lowerCase: lowerCaseCriteria.test(password),
+      number: numberCriteria.test(password),
+      specialChar: specialCharCriteria.test(password),
+    };
+  }
+
+  function handlePasswordChange(event) {
+    const newPassword = event.target.value;
+    setPassword(newPassword);
+    setPasswordCriteria(validatePassword(newPassword));
+  }
 
   async function handleSignUp() {
     if (!name || !email || !password) {
@@ -32,8 +65,16 @@ export function SignUp() {
       return;
     }
 
-    if (!validateEmail(email)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
       setStatusMessage("O e-mail fornecido não é válido.");
+      setIsStatusVisible(true);
+      return;
+    }
+
+    if (showPasswordCriteria) {
+      setStatusMessage("A senha deve atender a todos os critérios.");
       setIsStatusVisible(true);
       return;
     }
@@ -110,8 +151,38 @@ export function SignUp() {
           placeholder="Senha"
           type="password"
           icon={FiLock}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePasswordChange}
         />
+        {showPasswordCriteria && (
+          <PasswordCriteria>
+            <p>Critérios da senha:</p>
+            <ul>
+              <li style={{ color: passwordCriteria.length ? "green" : "red" }}>
+                Pelo menos 8 caracteres
+              </li>
+              <li
+                style={{ color: passwordCriteria.upperCase ? "green" : "red" }}
+              >
+                Pelo menos uma letra maiúscula
+              </li>
+              <li
+                style={{ color: passwordCriteria.lowerCase ? "green" : "red" }}
+              >
+                Pelo menos uma letra minúscula
+              </li>
+              <li style={{ color: passwordCriteria.number ? "green" : "red" }}>
+                Pelo menos um número
+              </li>
+              <li
+                style={{
+                  color: passwordCriteria.specialChar ? "green" : "red",
+                }}
+              >
+                Pelo menos um caractere especial
+              </li>
+            </ul>
+          </PasswordCriteria>
+        )}
 
         <Button title="Cadastrar" onClick={handleSignUp} />
 
