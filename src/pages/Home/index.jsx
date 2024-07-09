@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Note } from "../../components/Note";
-import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Header } from "../../components/Header";
 import { Section } from "../../components/Section";
