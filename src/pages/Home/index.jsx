@@ -79,6 +79,7 @@ export function Home() {
         }
       } finally {
         setIsLoading(false);
+        setIsStatusVisible(false)
       }
     }
 
